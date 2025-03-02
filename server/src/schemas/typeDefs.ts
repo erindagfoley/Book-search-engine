@@ -25,7 +25,6 @@ const typeDefs = gql`
 
   type Query {
     getSingleUser(_id: String!, username: String!): User
-    login(username: String!, email: String!)
   }
 
   type Mutation {
