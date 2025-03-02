@@ -35,7 +35,7 @@ const LoginForm = ({}: { handleModalClose: () => void }) => {
       });
 
       Auth.login(data.login.token);
-      userFormData('');
+      handleModalClose();
     } catch (err) {
       console.error(err);
       setShowAlert(true);
