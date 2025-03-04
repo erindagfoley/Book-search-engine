@@ -41,6 +41,7 @@ const resolvers = {
       return { token, user };
     },
     saveBook: async (_parent: any, { bookData }: { bookData: any }, context: Context) => {
+      console.log("Save",context.user,bookData)
       if (!context.user) {
         throw new AuthenticationError('You need to be logged in!');
       }
@@ -51,6 +52,7 @@ const resolvers = {
           { $addToSet: { savedBooks: bookData } },
           { new: true, runValidators: true }
         );
+console.log(updatedUser);
 
         return updatedUser;
       } catch (err) {
