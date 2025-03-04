@@ -1,7 +1,6 @@
-import { AuthenticationError } from 'apollo-server-errors'; 
+// import { AuthenticationError } from 'apollo-server-errors'; 
 import User from '../models/User.js';
-import { signToken } from '../services/auth.js';
-
+import { signToken, AuthenticationError  } from '../utils/auth.js';
 interface UserContext {
   _id: string;
   username: string;
@@ -14,7 +13,7 @@ interface Context {
 
 const resolvers = {
   Query: {
-    me: async (_parent: any, _args: any, context: Context) => {
+    getSingleUser: async (_parent: any, _args: any, context: Context) => {
       if (context.user) {
         return User.findById(context.user._id);
       }
@@ -23,7 +22,7 @@ const resolvers = {
   },
   Mutation: {
     login: async (_parent: any, { email, password }: { email: string, password: string }) => {
-      const user = await User.findOne({ email });
+      const user:any = await User.findOne({ email });
       if (!user) {
         throw new AuthenticationError("Can't find this user");
       }
@@ -33,15 +32,15 @@ const resolvers = {
         throw new AuthenticationError('Wrong password!');
       }
 
-      const token = signToken({ username: user.username, email: user.email, _id: user._id.toString() });
+      const token = signToken( user.username, user.email, user._id.toString() );
       return { token, user };
     },
     addUser: async (_parent: any, { username, email, password }: { username: string, email: string, password: string }) => {
-      const user = await User.create({ username, email, password });
-      const token = signToken({ username: user.username, email: user.email, _id: user._id.toString() });
+      const user:any = await User.create({ username, email, password });
+      const token = signToken( user.username, user.email, user._id.toString() );
       return { token, user };
     },
-    saveBook: async (_: any, { bookData }: { bookData: any }, context: Context) => {
+    saveBook: async (_parent: any, { bookData }: { bookData: any }, context: Context) => {
       if (!context.user) {
         throw new AuthenticationError('You need to be logged in!');
       }
@@ -59,7 +58,38 @@ const resolvers = {
         throw new Error('Failed to save book');
       }
     },
+    deleteBook: async (_parent: any, { bookData }: { bookData: any }, context: Context) => {
+      if (!context.user) {
+        throw new AuthenticationError('You need to be logged in!');
+      }
+
+      try {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { savedBooks: bookData } },
+          { new: true, runValidators: true }
+        );
+
+        return updatedUser;
+      } catch (err) {
+        console.error(err);
+        throw new Error('Failed to delete book');
+      }
+    },
+
+    // deleteBook: async (_parent: any, { bookID }: deleteBookArgs, context: any) => {
+//   if (context.user) {
+//     return User.findOneAndUpdate(
+//       { _id: userId },
+//       {
+//         $pull: { savedBooks: {_id: bookId } } },
+//       { new: true }
+//     );
+//   }
+//   throw AuthenticationError;
+// },
   },
 };
 
 export default resolvers;
+
