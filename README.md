@@ -54,5 +54,5 @@ Thank you to Sangeetha Kaliaperumal and Kayvon Kazemini for their assistance in 
 
 ## Questions
 If you have any questions or need further assistance, feel free to reach out:
-- **GitHub Profile**: [Your GitHub Profile](https://github.com/erindagfoley)  
+- **GitHub Profile**: https://github.com/erindagfoley  
 - **Email**: erindagfoley@gmail.com  
